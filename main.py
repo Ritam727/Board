@@ -26,9 +26,9 @@ def draw(event, x, y, flags, param):
 
 img = np.zeros((720, 1280, 3), np.uint8)
 cv.namedWindow('Paint')
-cv.createTrackbar('B', 'Paint', 255, 255, nothing)
-cv.createTrackbar('G', 'Paint', 255, 255, nothing)
 cv.createTrackbar('R', 'Paint', 255, 255, nothing)
+cv.createTrackbar('G', 'Paint', 255, 255, nothing)
+cv.createTrackbar('B', 'Paint', 255, 255, nothing)
 cv.createTrackbar('Brush Size', 'Paint', 2, 20, nothing)
 cv.setMouseCallback('Paint', draw)
 prev = brColor
@@ -44,9 +44,9 @@ while True:
     if not mode:
         brColor = [0, 0, 0]
     else:
-        brColor = [gtp('R', 'Paint'), gtp('G', 'Paint'), gtp('B', 'Paint')]
+        brColor = [gtp('B', 'Paint'), gtp('G', 'Paint'), gtp('R', 'Paint')]
     brushSize = gtp('Brush Size', 'Paint')
 
-    cv.rectangle(img, (1260, 0), (1280, 20), tuple(brColor), -1)
+    cv.rectangle(img, (1220, 0), (1280, 60), tuple(brColor), -1)
 
 cv.destroyAllWindows()
