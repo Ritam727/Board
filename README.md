@@ -15,3 +15,5 @@ To install the requirements, run the following command(make sure you have python
 Then run the program with:
 
 `$ python main.py`
+
+Change the R, G and B values to tweak the colour of the brush. Press 'e' to change to erase mode and 'esc' to quit.
