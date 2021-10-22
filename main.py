@@ -5,6 +5,7 @@ from cv2 import getTrackbarPos as gtp
 drawing = False
 brColor = [255, 255, 255]
 brushSize = 2
+mode = True
 
 def nothing(t):
     pass
@@ -30,14 +31,22 @@ cv.createTrackbar('G', 'Paint', 255, 255, nothing)
 cv.createTrackbar('R', 'Paint', 255, 255, nothing)
 cv.createTrackbar('Brush Size', 'Paint', 2, 20, nothing)
 cv.setMouseCallback('Paint', draw)
+prev = brColor
 
 while True:
     cv.imshow('Paint', img)
     k = cv.waitKey(1) & 0xFF
     if k == 27:
         break
+    elif k == ord('e'):
+        mode = not mode
 
-    brColor = [gtp('R', 'Paint'), gtp('G', 'Paint'), gtp('B', 'Paint')]
+    if not mode:
+        brColor = [0, 0, 0]
+    else:
+        brColor = [gtp('R', 'Paint'), gtp('G', 'Paint'), gtp('B', 'Paint')]
     brushSize = gtp('Brush Size', 'Paint')
+
+    cv.rectangle(img, (1260, 0), (1280, 20), tuple(brColor), -1)
 
 cv.destroyAllWindows()
