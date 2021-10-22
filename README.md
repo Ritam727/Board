@@ -6,6 +6,8 @@ If you want to use it, download the code as a zip file and then unzip it, or you
 
 `$ git clone git@github.com:Ritam727/Board.git`
 
+`$ cd Board/`
+
 To install the requirements, run the following command(make sure you have python3 and pip installed on your machine):
 
 `$ pip install -r requrements.txt`
