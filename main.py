@@ -1,11 +1,13 @@
 import numpy as np
 import cv2 as cv
+from screeninfo import get_monitors
 from cv2 import getTrackbarPos as gtp
 
 drawing = False
 brColor = [255, 255, 255]
 brushSize = 2
 mode = True
+screenDim = (get_monitors()[0].height, get_monitors()[0].width)
 
 def nothing(t):
     pass
@@ -24,7 +26,7 @@ def draw(event, x, y, flags, param):
         drawing = False
         cv.circle(img, (x, y), brushSize, tuple(brColor), -1)
 
-img = np.zeros((720, 1280, 3), np.uint8)
+img = np.zeros((*screenDim, 3), np.uint8)
 cv.namedWindow('Paint')
 cv.createTrackbar('R', 'Paint', 255, 255, nothing)
 cv.createTrackbar('G', 'Paint', 255, 255, nothing)
@@ -47,6 +49,6 @@ while True:
         brColor = [gtp('B', 'Paint'), gtp('G', 'Paint'), gtp('R', 'Paint')]
     brushSize = gtp('Brush Size', 'Paint')
 
-    cv.rectangle(img, (1220, 0), (1280, 60), tuple(brColor), -1)
+    cv.rectangle(img, (screenDim[1]-60, 0), (screenDim[1], 60), tuple(brColor), -1)
 
 cv.destroyAllWindows()
