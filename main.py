@@ -8,25 +8,28 @@ brColor = [255, 255, 255]
 brushSize = 2
 mode = True
 screenDim = (get_monitors()[0].height, get_monitors()[0].width)
+ix, iy = -1, -1
 
 def nothing(t):
     pass
 
 def draw(event, x, y, flags, param):
-    global drawing, brColor, brushSize
+    global drawing, brColor, brushSize, ix, iy
 
     if event == cv.EVENT_LBUTTONDOWN:
         drawing = True
+        ix, iy = x, y
 
     elif event == cv.EVENT_MOUSEMOVE:
         if drawing == True:
-            cv.circle(img, (x, y), brushSize, tuple(brColor), -1)
+            cv.line(img, (ix, iy), (x, y), tuple(brColor), brushSize)
+            ix, iy = x, y
 
     elif event == cv.EVENT_LBUTTONUP:
         drawing = False
         cv.circle(img, (x, y), brushSize, tuple(brColor), -1)
 
-img = np.zeros((*screenDim, 3), np.uint8)
+img = np.zeros((screenDim[0]-200, screenDim[1], 3), np.uint8)
 cv.namedWindow('Paint')
 cv.createTrackbar('R', 'Paint', 255, 255, nothing)
 cv.createTrackbar('G', 'Paint', 255, 255, nothing)
