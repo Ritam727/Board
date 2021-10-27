@@ -27,7 +27,7 @@ def draw(event, x, y, flags, param):
 
     elif event == cv.EVENT_LBUTTONUP:
         drawing = False
-        cv.circle(img, (x, y), brushSize, tuple(brColor), -1)
+        cv.line(img, (ix, iy), (x, y), tuple(brColor), brushSize)
 
 img = np.zeros((screenDim[0]-200, screenDim[1], 3), np.uint8)
 cv.namedWindow('Paint')
@@ -48,9 +48,10 @@ while True:
 
     if not mode:
         brColor = [0, 0, 0]
+        brushSize = gtp('Brush Size', 'Paint')*10
     else:
         brColor = [gtp('B', 'Paint'), gtp('G', 'Paint'), gtp('R', 'Paint')]
-    brushSize = gtp('Brush Size', 'Paint')
+        brushSize = gtp('Brush Size', 'Paint')
 
     cv.rectangle(img, (screenDim[1]-60, 0), (screenDim[1], 60), tuple(brColor), -1)
 
