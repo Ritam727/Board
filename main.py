@@ -43,6 +43,9 @@ while True:
     k = cv.waitKey(1) & 0xFF
     if k == 27:
         break
+    elif k == ord('s'):
+        print("saving")
+        cv.imwrite("painting.png", img)
     elif k == ord('e'):
         mode = not mode
 
