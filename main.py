@@ -2,6 +2,9 @@ import numpy as np
 import cv2 as cv
 from screeninfo import get_monitors
 from cv2 import getTrackbarPos as gtp
+from datetime import datetime
+import subprocess as sb
+import os
 
 drawing = False
 brColor = [255, 255, 255]
@@ -45,7 +48,12 @@ while True:
         break
     elif k == ord('s'):
         print("saving")
-        cv.imwrite("painting.png", img)
+        exists = sb.run("ls | grep savedImages", shell = True, capture_output = True)
+        if exists.stdout.decode("utf-8") == "":
+            os.system("mkdir savedImages")
+        curr = str(datetime.now()).split()
+        print(img.shape)
+        cv.imwrite("./savedImages/BoardDrawing_"+curr[0]+"_"+curr[1]+".png", img[:, :img.shape[1]-60])
     elif k == ord('e'):
         mode = not mode
 
