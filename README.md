@@ -16,8 +16,6 @@ Then run the program with:
 
 `$ python main.py`
 
-to save the image you can add a save argument:
-
-`$ python main.py save`
+to save the image you can press the key 's' anytime
 
 Change the R, G and B values to tweak the colour of the brush, the colour you are currently using is visible in the top left corner of the drawing screen. Press 'e' to change to erase mode and 'esc' to quit.
