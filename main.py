@@ -2,14 +2,6 @@ import numpy as np
 import cv2 as cv
 from screeninfo import get_monitors
 from cv2 import getTrackbarPos as gtp
-import sys
-
-# defaults to not save the image
-save_image = False
-# if there is an argument called save
-# it will change it to True
-if len(sys.argv) == 2 and sys.argv[1] == "save":
-    save_image = True
 
 drawing = False
 brColor = [255, 255, 255]
@@ -50,9 +42,10 @@ while True:
     cv.imshow('Paint', img)
     k = cv.waitKey(1) & 0xFF
     if k == 27:
-        if save_image:
-            cv.imwrite("painting.jpg", img)
         break
+    elif k == ord('s'):
+        print("saving")
+        cv.imwrite("painting.png", img)
     elif k == ord('e'):
         mode = not mode
 
