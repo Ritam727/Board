@@ -47,12 +47,11 @@ while True:
     if k == 27:
         break
     elif k == ord('s'):
-        print("saving")
+        print("Saving...")
         exists = sb.run("ls | grep savedImages", shell = True, capture_output = True)
         if exists.stdout.decode("utf-8") == "":
             os.system("mkdir savedImages")
         curr = str(datetime.now()).split()
-        print(img.shape)
         cv.imwrite("./savedImages/BoardDrawing_"+curr[0]+"_"+curr[1]+".png", img[:, :img.shape[1]-60])
     elif k == ord('e'):
         mode = not mode
