@@ -45,7 +45,9 @@ cv.namedWindow('Controls')
 cv.createTrackbar('R', 'Controls', 255, 255, nothing)
 cv.createTrackbar('G', 'Controls', 255, 255, nothing)
 cv.createTrackbar('B', 'Controls', 255, 255, nothing)
-cv.createTrackbar('Brush Size', 'Controls', 2, 20, nothing)
+cv.createTrackbar('Background Color', 'Controls', 0, 255, nothing)
+cv.createTrackbar('Brush Size', 'Controls', 5, 20, nothing)
+cv.createTrackbar('Eraser Size', 'Controls', 10, 50, nothing)
 # controls for window size
 cv.createTrackbar('Height', 'Controls', height, screenDim[0]-205, nothing)
 cv.createTrackbar('Width', 'Controls', width, screenDim[1], nothing)
@@ -54,6 +56,15 @@ cv.namedWindow("Paint")
 cv.setMouseCallback('Paint', draw)
 
 while True:
+    bgcolornewValue = gtp("Background Color", "Controls")
+    backgroundColorNew = [bgcolornewValue, bgcolornewValue, bgcolornewValue]
+
+    if backgroundColorNew != backgroundColor:
+        color_low=np.array([i-10 for i in backgroundColor])    # Define lower and uppper limits
+        color_high=np.array([i+10 for i in backgroundColor])
+        mask=cv.inRange(img, color_low, color_high)  # Mask image to only select previous color
+        img[mask>0]= tuple(backgroundColorNew) # Change image to newColor where we found previous BackgroundColor
+        backgroundColor = backgroundColorNew
 
     heightNew = gtp('Height', 'Controls')
     widthNew = gtp('Width', 'Controls')
@@ -86,14 +97,18 @@ while True:
     elif k == ord('e'):
         # eraser mode toggle
         mode = not mode
+    elif k == ord('n'):
+        # erase everything and start new board
+        img = np.zeros((height, width, 3), np.uint8)
+        backgroundColor = [0,0,0]
 
     if not mode:
         # when eraser mode on then brush color = background color
         brushColor = backgroundColor
-        brushSize = gtp('Brush Size', 'Controls')*10
+        brushSize = 1 + gtp('Eraser Size', 'Controls')
     else:
         brushColor = [gtp('B', 'Controls'), gtp('G', 'Controls'), gtp('R', 'Controls')]
-        brushSize = gtp('Brush Size', 'Controls')
+        brushSize = 1 + gtp('Brush Size', 'Controls')
 
     currentColorImg = np.zeros((200, 350, 3), np.uint8)
     cv.rectangle(currentColorImg, (0,0), (350, 200), tuple(brushColor), -1)
