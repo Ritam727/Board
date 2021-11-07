@@ -63,7 +63,7 @@ while True:
         if widthNew < min_width:
             widthNew = min_width
 
-        if(heightNew > height or widthNew>width):
+        if(heightNew > height or widthNew > width):
             imgNew = np.zeros((heightNew, widthNew, 3), np.uint8)
             imgNew[:height,:width] = img
             img = imgNew
