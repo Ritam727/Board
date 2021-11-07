@@ -11,7 +11,7 @@ min_width = 300
 min_height = 300
 height = 500
 width = 700
-brColor = [255, 255, 255]
+brushColor = [255, 255, 255]
 brushSize = 2
 mode = True
 screenDim = (get_monitors()[0].height, get_monitors()[0].width)
@@ -22,45 +22,54 @@ def nothing(t):
     pass
 
 def draw(event, x, y, flags, param):
-    global drawing, brColor, brushSize, ix, iy
+    global drawing, brushColor, brushSize, ix, iy
 
     if event == cv.EVENT_LBUTTONDOWN:
         drawing = True
         ix, iy = x, y
     elif event == cv.EVENT_MOUSEMOVE:
         if drawing == True:
-            cv.line(img, (ix, iy), (x, y), tuple(brColor), brushSize)
+            cv.line(img, (ix, iy), (x, y), tuple(brushColor), brushSize)
             ix, iy = x, y
     elif event == cv.EVENT_LBUTTONUP:
         drawing = False
-        cv.line(img, (ix, iy), (x, y), tuple(brColor), brushSize)
+        cv.line(img, (ix, iy), (x, y), tuple(brushColor), brushSize)
 
 # setting up canvas to draw on
+# background color is black
+backgroundColor = [0,0,0]
 img = np.zeros((height, width, 3), np.uint8)
 
+cv.namedWindow('Controls')
 # controls for color and brush size
-cv.namedWindow('Paint')
-cv.createTrackbar('R', 'Paint', 255, 255, nothing)
-cv.createTrackbar('G', 'Paint', 255, 255, nothing)
-cv.createTrackbar('B', 'Paint', 255, 255, nothing)
-cv.createTrackbar('Brush Size', 'Paint', 2, 20, nothing)
-
+cv.createTrackbar('R', 'Controls', 255, 255, nothing)
+cv.createTrackbar('G', 'Controls', 255, 255, nothing)
+cv.createTrackbar('B', 'Controls', 255, 255, nothing)
+cv.createTrackbar('Brush Size', 'Controls', 2, 20, nothing)
 # controls for window size
-cv.namedWindow("Controls")
 cv.createTrackbar('Height', 'Controls', height, screenDim[0]-205, nothing)
 cv.createTrackbar('Width', 'Controls', width, screenDim[1], nothing)
+
+cv.namedWindow("Paint")
 cv.setMouseCallback('Paint', draw)
 
 while True:
 
-    heightn = gtp('Height', 'Controls')
-    widthn = gtp('Width', 'Controls')
-    if heightn!= height or widthn!=width:
-        if heightn > min_height:
-            height = heightn
-        if widthn > min_width:
-            width = widthn
-        img = cv.resize(img , dsize = (width, height), interpolation = cv.INTER_CUBIC)
+    heightNew = gtp('Height', 'Controls')
+    widthNew = gtp('Width', 'Controls')
+    if heightNew!= height or widthNew!=width:
+        if heightNew < min_height:
+            heightNew = min_height
+        if widthNew < min_width:
+            widthNew = min_width
+
+        if(heightNew > height or widthNew>width):
+            imgNew = np.zeros((heightNew, widthNew, 3), np.uint8)
+            imgNew[:height,:width] = img
+            img = imgNew
+        else:
+            img = cv.resize(img , dsize = (widthNew, heightNew), interpolation = cv.INTER_CUBIC)
+        height, width = heightNew, widthNew
 
     cv.imshow('Paint', img)
     k = cv.waitKey(1) & 0xFF
@@ -80,12 +89,14 @@ while True:
 
     if not mode:
         # when eraser mode on then brush color = background color
-        brColor = [0, 0, 0]
-        brushSize = gtp('Brush Size', 'Paint')*10
+        brushColor = backgroundColor
+        brushSize = gtp('Brush Size', 'Controls')*10
     else:
-        brColor = [gtp('B', 'Paint'), gtp('G', 'Paint'), gtp('R', 'Paint')]
-        brushSize = gtp('Brush Size', 'Paint')
+        brushColor = [gtp('B', 'Controls'), gtp('G', 'Controls'), gtp('R', 'Controls')]
+        brushSize = gtp('Brush Size', 'Controls')
 
-    cv.rectangle(img, (screenDim[1]-60, 0), (screenDim[1], 60), tuple(brColor), -1)
+    currentColorImg = np.zeros((200, 350, 3), np.uint8)
+    cv.rectangle(currentColorImg, (0,0), (350, 200), tuple(brushColor), -1)
+    cv.imshow("Controls", currentColorImg)
 
 cv.destroyAllWindows()
