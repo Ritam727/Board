@@ -16,6 +16,6 @@ Then run the program with:
 
 `$ python main.py`
 
-Change the R, G and B values to tweak the colour of the brush, the colour you are currently using is visible in the top left corner of the drawing screen. Press 'e' to change to erase mode and 'esc' to quit. Press 's' to save the current frame to a folder named `savedImages` in the directory in which the program is currently located.
+Change the R, G and B values to tweak the colour of the brush, the colour you are currently using is visible in the top left corner of the drawing screen. Press 'e' to change to erase mode and 'esc' to quit. Press 's' to save the current frame to a folder named `savedImages` in the directory in which the program is currently located. Press 'z' to undo(at most 10 undos allowed).
 
 Controls shifted to new window, resizing feature added, though its incomplete. Note that in the current version only increasing height and width of window works as expected, but on reducing them, the image is also resized(any help regarding this would be appreciated).
