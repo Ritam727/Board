@@ -16,73 +16,65 @@ brushSize = 2
 mode = True
 screenDim = (get_monitors()[0].height, get_monitors()[0].width)
 ix, iy = -1, -1
+changes = []
+# redoList = []
+startIndexOfChange = 0
+oneTimeChange = []
+backgroundColor = [0,0,0]
 
 # does nothing but needed for Trackbar
 def nothing(t):
     pass
 
 def draw(event, x, y, flags, param):
-    global drawing, brushColor, brushSize, ix, iy
+    global startIndexOfChange,drawing, brushColor, brushSize, ix, iy
 
     if event == cv.EVENT_LBUTTONDOWN:
         drawing = True
         ix, iy = x, y
+        startIndexOfChange = len(changes)
     elif event == cv.EVENT_MOUSEMOVE:
         if drawing == True:
-            cv.line(img, (ix, iy), (x, y), tuple(brushColor), brushSize)
+            changes.append([(ix,iy),(x,y),tuple(brushColor),brushSize])
             ix, iy = x, y
     elif event == cv.EVENT_LBUTTONUP:
         drawing = False
-        cv.line(img, (ix, iy), (x, y), tuple(brushColor), brushSize)
+        changes.append([(ix, iy), (x, y), tuple(brushColor), brushSize])
+        endIndexOfChange = len(changes)
+        oneTimeChange.append((startIndexOfChange, endIndexOfChange))
 
-# setting up canvas to draw on
-# background color is black
-backgroundColor = [0,0,0]
-img = np.zeros((height, width, 3), np.uint8)
+def drawChanges(img, changes):
+    for i in changes:
+        cv.line(img, i[0], i[1],i[2], i[3])
+    return img
+
 
 cv.namedWindow('Controls')
 # controls for color and brush size
-cv.createTrackbar('R', 'Controls', 255, 255, nothing)
-cv.createTrackbar('G', 'Controls', 255, 255, nothing)
-cv.createTrackbar('B', 'Controls', 255, 255, nothing)
-cv.createTrackbar('Background Color', 'Controls', 0, 255, nothing)
+cv.createTrackbar('R', 'Controls', 0, 255, nothing)
+cv.createTrackbar('G', 'Controls', 0, 255, nothing)
+cv.createTrackbar('B', 'Controls', 0, 255, nothing)
+cv.createTrackbar('Background Color', 'Controls', 255, 255, nothing)
 cv.createTrackbar('Brush Size', 'Controls', 5, 20, nothing)
 cv.createTrackbar('Eraser Size', 'Controls', 10, 50, nothing)
 # controls for window size
-cv.createTrackbar('Height', 'Controls', height, screenDim[0]-205, nothing)
+cv.createTrackbar('Height', 'Controls', height, screenDim[0]-105, nothing)
 cv.createTrackbar('Width', 'Controls', width, screenDim[1], nothing)
 
 cv.namedWindow("Paint")
 cv.setMouseCallback('Paint', draw)
 
 while True:
-    bgcolornewValue = gtp("Background Color", "Controls")
-    backgroundColorNew = [bgcolornewValue, bgcolornewValue, bgcolornewValue]
+    temp = gtp('Background Color', 'Controls')
+    backgroundColor = [temp,temp,temp]
+    height = max(300,gtp('Height', 'Controls'))
+    width = max(300,gtp('Width', 'Controls'))
 
-    if backgroundColorNew != backgroundColor:
-        color_low=np.array([i-10 for i in backgroundColor])    # Define lower and uppper limits
-        color_high=np.array([i+10 for i in backgroundColor])
-        mask=cv.inRange(img, color_low, color_high)  # Mask image to only select previous color
-        img[mask>0]= tuple(backgroundColorNew) # Change image to newColor where we found previous BackgroundColor
-        backgroundColor = backgroundColorNew
-
-    heightNew = gtp('Height', 'Controls')
-    widthNew = gtp('Width', 'Controls')
-    if heightNew!= height or widthNew!=width:
-        if heightNew < min_height:
-            heightNew = min_height
-        if widthNew < min_width:
-            widthNew = min_width
-
-        if(heightNew > height or widthNew > width):
-            imgNew = np.zeros((heightNew, widthNew, 3), np.uint8)
-            imgNew[:height,:width] = img
-            img = imgNew
-        else:
-            img = cv.resize(img , dsize = (widthNew, heightNew), interpolation = cv.INTER_CUBIC)
-        height, width = heightNew, widthNew
-
+    img = np.zeros((height, width, 3), np.uint8)
+    cv.rectangle(img, (0,0), (width, height), tuple(backgroundColor), -1)
+    img = drawChanges(img, changes)
     cv.imshow('Paint', img)
+
     k = cv.waitKey(1) & 0xFF
     if k == 27:
         # 27 is for escape key
@@ -99,16 +91,25 @@ while True:
         mode = not mode
     elif k == ord('n'):
         # erase everything and start new board
-        img = np.zeros((height, width, 3), np.uint8)
-        backgroundColor = [0,0,0]
+        changes = []
+    elif k == ord('z'):
+        otc = oneTimeChange[len(oneTimeChange)-1]
+        
+        # for redo , not complete yet
+        # for i in changes[otc[0]:otc[1]]:
+        #     redoList.append(i)
+        
+        changes = changes[:otc[0]]
+        oneTimeChange = oneTimeChange[:len(oneTimeChange)-1]
 
-    if not mode:
+
+    if mode == False:
         # when eraser mode on then brush color = background color
         brushColor = backgroundColor
-        brushSize = 1 + gtp('Eraser Size', 'Controls')
+        brushSize = max(1,gtp('Eraser Size', 'Controls'))
     else:
         brushColor = [gtp('B', 'Controls'), gtp('G', 'Controls'), gtp('R', 'Controls')]
-        brushSize = 1 + gtp('Brush Size', 'Controls')
+        brushSize = max(1,gtp('Brush Size', 'Controls'))
 
     currentColorImg = np.zeros((200, 350, 3), np.uint8)
     cv.rectangle(currentColorImg, (0,0), (350, 200), tuple(brushColor), -1)
