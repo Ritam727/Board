@@ -93,15 +93,21 @@ while True:
         # erase everything and start new board
         changes = []
     elif k == ord('z'):
-        otc = oneTimeChange[len(oneTimeChange)-1]
-        
-        # for redo , not complete yet
-        # for i in changes[otc[0]:otc[1]]:
-        #     redoList.append(i)
-        
-        changes = changes[:otc[0]]
-        oneTimeChange = oneTimeChange[:len(oneTimeChange)-1]
+        if len(oneTimeChange) > 0:
+            otc = oneTimeChange[len(oneTimeChange)-1]
+            
+            # for redo , not complete yet
+            # for i in changes[otc[0]:otc[1]]:
+            #     redoList.append(i)
+            
+            changes = changes[:otc[0]]
+            oneTimeChange = oneTimeChange[:len(oneTimeChange)-1]
+        else:
+            pass
 
+    # allow atmost 10 undos(to avoid memory issues)
+    if len(oneTimeChange) > 10:
+        oneTimeChange = oneTimeChange[len(oneTimeChange)-10:]
 
     if mode == False:
         # when eraser mode on then brush color = background color
