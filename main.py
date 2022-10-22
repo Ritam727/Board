@@ -17,9 +17,10 @@ mode = True
 screenDim = (get_monitors()[0].height, get_monitors()[0].width)
 ix, iy = -1, -1
 changes = []
-# redoList = []
+redoList = []
 startIndexOfChange = 0
 oneTimeChange = []
+oneTimeRedo = []
 backgroundColor = [0,0,0]
 
 # does nothing but needed for Trackbar
@@ -95,16 +96,24 @@ while True:
     elif k == ord('z'):
         if len(oneTimeChange) > 0:
             otc = oneTimeChange[len(oneTimeChange)-1]
-            
-            # for redo , not complete yet
-            # for i in changes[otc[0]:otc[1]]:
-            #     redoList.append(i)
-            
+            # for redo
+            oneTimeRedo.append((len(redoList),len(redoList)+otc[1]-otc[0]))
+            for i in changes[otc[0]:otc[1]+1]:
+                redoList.append(i)
             changes = changes[:otc[0]]
             oneTimeChange = oneTimeChange[:len(oneTimeChange)-1]
         else:
             pass
-
+    elif k == ord('y'):
+        if len(oneTimeRedo) > 0:
+            otc = oneTimeRedo[len(oneTimeRedo)-1]
+            oneTimeChange.append((len(changes),len(changes)+otc[1]-otc[0]))
+            for i in redoList[otc[0]:otc[1]+1]:
+                changes.append(i)
+            redoList = redoList[:otc[0]]
+            oneTimeRedo = oneTimeRedo[:len(oneTimeRedo)-1]
+        else:
+            pass
     # allow atmost 10 undos(to avoid memory issues)
     if len(oneTimeChange) > 10:
         oneTimeChange = oneTimeChange[len(oneTimeChange)-10:]
